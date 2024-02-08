@@ -1,20 +1,21 @@
 package routers
 
 import (
+	"github.com/slamancn/gmon-server/routers/ws/v1"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	_ "github.com/EDDYCJY/go-gin-example/docs"
+	_ "github.com/slamancn/gmon-server/docs"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 
-	"github.com/EDDYCJY/go-gin-example/middleware/jwt"
-	"github.com/EDDYCJY/go-gin-example/pkg/export"
-	"github.com/EDDYCJY/go-gin-example/pkg/qrcode"
-	"github.com/EDDYCJY/go-gin-example/pkg/upload"
-	"github.com/EDDYCJY/go-gin-example/routers/api"
-	"github.com/EDDYCJY/go-gin-example/routers/api/v1"
+	"github.com/slamancn/gmon-server/middleware/jwt"
+	"github.com/slamancn/gmon-server/pkg/export"
+	"github.com/slamancn/gmon-server/pkg/qrcode"
+	"github.com/slamancn/gmon-server/pkg/upload"
+	"github.com/slamancn/gmon-server/routers/api"
+	"github.com/slamancn/gmon-server/routers/api/v1"
 )
 
 // InitRouter initialize routing information
@@ -60,6 +61,16 @@ func InitRouter() *gin.Engine {
 		//生成文章海报
 		apiv1.POST("/articles/poster/generate", v1.GenerateArticlePoster)
 	}
+
+	// 初始化ws配置
+	// html页面位置
+	r.LoadHTMLGlob("templates/*")
+	// 静态文件位置
+	r.Static("/static", "./static")
+	// ws长连接业务
+	r.GET("/", ws.Index)
+	r.GET("/ws", ws.InitWebSocket)
+	go r.Run("0.0.0.0:8080")
 
 	return r
 }
